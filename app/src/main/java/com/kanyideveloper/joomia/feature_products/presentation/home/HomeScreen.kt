@@ -1,7 +1,5 @@
 package com.kanyideveloper.joomia.feature_products.presentation.home
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -39,7 +37,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -65,7 +62,6 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    var filtersExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val productsState = viewModel.productsState.value
     val categories = viewModel.categoriesState.value
@@ -83,8 +79,11 @@ fun HomeScreen(
                         searchTerm = viewModel.searchTerm.value
                     )
                 },
-                onToggleExpand = {
-                    filtersExpanded = !filtersExpanded
+                categories = categories,
+                selectedCategory = viewModel.selectedCategory.value,
+                onSelectCategory = { category ->
+                    viewModel.setCategory(category)
+                    viewModel.getProducts(viewModel.selectedCategory.value)
                 },
             )
         },
@@ -98,42 +97,14 @@ fun HomeScreen(
                             message = event.message
                         )
                     }
+
                     else -> {}
                 }
             }
         }
-
-        DropdownMenu(
-            expanded = filtersExpanded,
-            offset = DpOffset(x = 200.dp, y = -600.dp),
-            onDismissRequest = {
-                filtersExpanded = !filtersExpanded
-            }
-        ) {
-            DropdownMenuItem(
-                content = { Text("Clothes") },
-                onClick = { Toast.makeText(context, "Clothes", Toast.LENGTH_SHORT).show() }
-            )
-            DropdownMenuItem(
-                content = { Text("Shoes") },
-                onClick = { Toast.makeText(context, "Shoes", Toast.LENGTH_SHORT).show() }
-            )
-            DropdownMenuItem(
-                content = { Text("Electronics") },
-                onClick = { Toast.makeText(context, "Electronics", Toast.LENGTH_SHORT).show() }
-            )
-        }
-
         HomeScreenContent(
-            categories = categories,
             productsState = productsState,
             navigator = navigator,
-            bannerImageUrl = viewModel.bannerImageState.value,
-            selectedCategory = viewModel.selectedCategory.value,
-            onSelectCategory = { category ->
-                viewModel.setCategory(category)
-                viewModel.getProducts(viewModel.selectedCategory.value)
-            }
         )
     }
 }
@@ -141,59 +112,18 @@ fun HomeScreen(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun HomeScreenContent(
-    categories: List<String>,
     productsState: ProductsState,
     navigator: DestinationsNavigator,
-    bannerImageUrl: String,
-    selectedCategory: String,
-    onSelectCategory: (String) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             cells = GridCells.Fixed(2),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(horizontal = 12.dp)
         ) {
-            item(span = { GridItemSpan(2) }) {
-                Card(
-                    elevation = 0.dp,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(170.dp)
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = bannerImageUrl)
-                                .apply(block = fun ImageRequest.Builder.() {
-                                    placeholder(R.drawable.ic_placeholder)
-                                    crossfade(true)
-                                }).build()
-                        ),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = "Black Friday Banner"
-                    )
-                }
-
-            } // Header for some banner Image
-
             // Some spacer
-            item(span = { GridItemSpan(2) }) {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            item(span = { GridItemSpan(2) }) {
-                Categories(
-                    categories = categories,
-                    onSelectCategory = onSelectCategory,
-                    selectedCategory = selectedCategory
-                )
-            } // Header with a lazyRow for product categories
-
-            // Some spacer
-            item(span = { GridItemSpan(2) }) {
-                Spacer(modifier = Modifier.height(12.dp))
-            }
+//            item(span = { GridItemSpan(2) }) {
+//                Spacer(modifier = Modifier.height(0.dp))
+//            }
 
             // Actual product items list
             items(productsState.products) { product ->
@@ -201,7 +131,7 @@ private fun HomeScreenContent(
                     product = product,
                     navigator = navigator,
                     modifier = Modifier
-                        .width(150.dp)
+                        .width(154.dp)
                 )
             }
         }
@@ -209,7 +139,7 @@ private fun HomeScreenContent(
         if (productsState.isLoading) {
             LoadingAnimation(
                 modifier = Modifier.align(Center),
-                circleSize = 16.dp,
+                circleSize = 12.dp,
             )
         }
 
@@ -242,7 +172,7 @@ private fun ProductItem(
     ) {
         Column(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp),
+                .padding(start = 8.dp, end = 8.dp),
             horizontalAlignment = Alignment.Start,
         ) {
             Image(
@@ -339,7 +269,9 @@ fun MyTopAppBar(
     currentSearchText: String,
     onSearchTextChange: (String) -> Unit,
     onSearch: () -> Unit,
-    onToggleExpand: () -> Unit,
+    categories: List<String>,
+    onSelectCategory: (String) -> Unit,
+    selectedCategory: String,
 ) {
     Column(
         Modifier
@@ -356,21 +288,7 @@ fun MyTopAppBar(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = CenterVertically
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current)
-                            .data(data = "https://firebasestorage.googleapis.com/v0/b/mealtime-7a501.appspot.com/o/tinywow_Joomia%20Black%20Friday_16608968%20(1).png?alt=media&token=8b874def-e543-482e-80f7-c8cbe9d9f206")
-                            .apply(block = fun ImageRequest.Builder.() {
-                                crossfade(true)
-                            }).build()
-                    ),
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(35.dp),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(text = "Hi, John", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
@@ -401,7 +319,7 @@ fun MyTopAppBar(
                 },
 
                 modifier = Modifier
-                    .fillMaxWidth(0.80f)
+                    .fillMaxWidth(1f)
                     .background(MainWhiteColor, shape = RoundedCornerShape(8.dp))
                     .clickable {
 
@@ -439,31 +357,21 @@ fun MyTopAppBar(
                     )
                 }
             )
-
-            IconButton(onClick = onToggleExpand) {
-                Icon(
-                    modifier = Modifier
-                        .size(55.dp)
-                        .clip(
-                            shape = RoundedCornerShape(
-                                size = 8.dp
-                            )
-                        )
-                        .background(
-                            MainWhiteColor
-                        )
-                        .padding(
-                            start = 4.dp,
-                            end = 4.dp,
-                            top = 4.dp,
-                            bottom = 4.dp
-                        ),
-                    painter = painterResource(id = R.drawable.ic_filter),
-                    contentDescription = null,
-                    tint = DarkBlue
-                )
-            }
         }
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = CenterVertically
+        ) {
+            Categories(
+                categories = categories,
+                onSelectCategory = onSelectCategory,
+                selectedCategory = selectedCategory
+            )
+        } // Header with a lazyRow for product categories
+
     }
 }
 
@@ -500,7 +408,8 @@ fun Categories(
                         }
                     )
                     .padding(
-                        10.dp
+                        horizontal = 10.dp,
+                        vertical = 8.dp
                     )
             )
         }

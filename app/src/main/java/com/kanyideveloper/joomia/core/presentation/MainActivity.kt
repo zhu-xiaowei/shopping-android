@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
                     val navHostEngine = rememberNavHostEngine()
                     val newBackStackEntry by navController.currentBackStackEntryAsState()
                     val route = newBackStackEntry?.destination?.route
-
                     CustomScaffold(
                         navController = navController,
                         showBottomBar = route in listOf(

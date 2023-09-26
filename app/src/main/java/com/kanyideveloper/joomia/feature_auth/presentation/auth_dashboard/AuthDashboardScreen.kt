@@ -50,12 +50,12 @@ fun AuthDashboardScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.TopStart
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.banner_image),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+//                Image(
+//                    painter = painterResource(id = R.drawable.banner_image),
+//                    contentDescription = null,
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentScale = ContentScale.Crop
+//                )
 
                 Column(
                     modifier = Modifier
