@@ -37,6 +37,9 @@ import com.kanyideveloper.joomia.feature_wish_list.domain.model.Wishlist
 import com.kanyideveloper.joomia.feature_wish_list.presentation.wishlist.WishlistViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import software.aws.solution.clickstream.ClickstreamAnalytics
+import software.aws.solution.clickstream.ClickstreamEvent
+import software.aws.solution.clickstream.ClickstreamItem
 
 @Destination
 @Composable
@@ -233,6 +236,21 @@ fun DetailsScreenContent(
 
                     Button(
                         onClick = {
+                            val itemProduct = ClickstreamItem.builder()
+                                .add(ClickstreamAnalytics.Item.ITEM_ID, product.id)
+                                .add(ClickstreamAnalytics.Item.ITEM_NAME, product.title)
+                                .add(ClickstreamAnalytics.Item.ITEM_CATEGORY, product.category)
+                                .add(ClickstreamAnalytics.Item.PRICE, product.price)
+                                .add("rating", product.rating.rate)
+                                .add("description", product.description)
+                                .build()
+                            val event = ClickstreamEvent.builder()
+                                .name("add_to_cart")
+                                .add("product_id", product.id)
+                                .add("page_name","product_detail_screen")
+                                .setItems(arrayOf(itemProduct))
+                                .build()
+                            ClickstreamAnalytics.recordEvent(event)
                         },
                         colors = ButtonDefaults.buttonColors(
                             contentColor = Color.Black,

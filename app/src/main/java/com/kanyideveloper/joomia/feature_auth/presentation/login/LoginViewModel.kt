@@ -1,5 +1,6 @@
 package com.kanyideveloper.joomia.feature_auth.presentation.login
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import software.aws.solution.clickstream.ClickstreamAnalytics
+import software.aws.solution.clickstream.ClickstreamUserAttribute
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,6 +45,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
     private val _eventFlow = MutableSharedFlow<UiEvents>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    @SuppressLint("Range")
     fun loginUser() {
         viewModelScope.launch {
             _loginState.value = loginState.value.copy(isLoading = true)
@@ -64,6 +68,14 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
 
             when (loginResult.result) {
                 is Resource.Success -> {
+                    ClickstreamAnalytics.setUserId(usernameState.value.text)
+                    val userAttribute = ClickstreamUserAttribute.builder()
+                        .add("user_name", usernameState.value.text)
+                        .add("user_age", 18)
+                        .add("user_state", true)
+                        .build()
+                    ClickstreamAnalytics.addUserAttributes(userAttribute)
+                    ClickstreamAnalytics.recordEvent("login")
                     _eventFlow.emit(
                         UiEvents.NavigateEvent(HomeScreenDestination.route)
                     )

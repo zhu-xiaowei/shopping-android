@@ -13,10 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -53,6 +49,11 @@ import com.kanyideveloper.joomia.feature_products.domain.model.Product
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
+import software.aws.solution.clickstream.ClickstreamAnalytics
+import software.aws.solution.clickstream.ClickstreamEvent
+import software.aws.solution.clickstream.ClickstreamItem
+import timber.log.Timber
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
@@ -127,6 +128,20 @@ private fun HomeScreenContent(
 
             // Actual product items list
             items(productsState.products) { product ->
+                val itemProduct = ClickstreamItem.builder()
+                    .add(ClickstreamAnalytics.Item.ITEM_ID, product.id)
+                    .add(ClickstreamAnalytics.Item.ITEM_NAME, product.title)
+                    .add(ClickstreamAnalytics.Item.ITEM_CATEGORY, product.category)
+                    .add(ClickstreamAnalytics.Item.PRICE, product.price)
+                    .add("rating", product.rating.rate)
+                    .add("description", product.description)
+                    .build()
+                val event = ClickstreamEvent.builder()
+                    .name("product_exposure")
+                    .add("product_id", product.id)
+                    .setItems(arrayOf(itemProduct))
+                    .build()
+                ClickstreamAnalytics.recordEvent(event)
                 ProductItem(
                     product = product,
                     navigator = navigator,
@@ -238,7 +253,23 @@ private fun ProductItem(
             )
 
             OutlinedButton(
-                onClick = {},
+                onClick = {
+                    val itemProduct = ClickstreamItem.builder()
+                        .add(ClickstreamAnalytics.Item.ITEM_ID, product.id)
+                        .add(ClickstreamAnalytics.Item.ITEM_NAME, product.title)
+                        .add(ClickstreamAnalytics.Item.ITEM_CATEGORY, product.category)
+                        .add(ClickstreamAnalytics.Item.PRICE, product.price)
+                        .add("rating", product.rating.rate)
+                        .add("description", product.description)
+                        .build()
+                    val event = ClickstreamEvent.builder()
+                        .name("add_to_cart")
+                        .add("product_id", product.id)
+                        .add("page_name","home_screen")
+                        .setItems(arrayOf(itemProduct))
+                        .build()
+                    ClickstreamAnalytics.recordEvent(event)
+                },
                 modifier = Modifier
                     .size(40.dp)
                     .align(End),
