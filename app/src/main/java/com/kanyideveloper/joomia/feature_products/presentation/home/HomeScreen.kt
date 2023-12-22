@@ -1,8 +1,12 @@
 package com.kanyideveloper.joomia.feature_products.presentation.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -52,9 +56,8 @@ import kotlinx.coroutines.flow.collectLatest
 import software.aws.solution.clickstream.ClickstreamAnalytics
 import software.aws.solution.clickstream.ClickstreamEvent
 import software.aws.solution.clickstream.ClickstreamItem
-import timber.log.Timber
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
 @Composable
@@ -118,7 +121,7 @@ private fun HomeScreenContent(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
-            cells = GridCells.Fixed(2),
+            columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(horizontal = 12.dp)
         ) {
             // Some spacer
@@ -265,7 +268,7 @@ private fun ProductItem(
                     val event = ClickstreamEvent.builder()
                         .name("add_to_cart")
                         .add("product_id", product.id)
-                        .add("page_name","home_screen")
+                        .add("page_name", "home_screen")
                         .setItems(arrayOf(itemProduct))
                         .build()
                     ClickstreamAnalytics.recordEvent(event)
