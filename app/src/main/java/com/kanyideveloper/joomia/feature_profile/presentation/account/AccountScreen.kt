@@ -37,6 +37,7 @@ import com.kanyideveloper.joomia.destinations.HomeScreenDestination
 import com.kanyideveloper.joomia.destinations.WishlistScreenDestination
 import com.kanyideveloper.joomia.feature_profile.domain.model.Account
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
+import com.kanyideveloper.joomia.feature_profile.domain.model.getDisplayName
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -223,19 +224,7 @@ fun UserItem(
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "${
-                        user.name?.firstname?.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.getDefault()
-                            ) else it.toString()
-                        }
-                    }  ${
-                        user.name?.lastname?.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.getDefault()
-                            ) else it.toString()
-                        }
-                    }",
+                    text = user.getDisplayName(),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 18.sp,

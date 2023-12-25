@@ -21,13 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase) : ViewModel() {
 
-    private val _usernameState = mutableStateOf(TextFieldState(text = "johnd"))
+    private val _usernameState = mutableStateOf(TextFieldState(text = ""))
     val usernameState: State<TextFieldState> = _usernameState
     fun setUsername(value: String) {
         _usernameState.value = usernameState.value.copy(text = value)
     }
 
-    private val _passwordState = mutableStateOf(TextFieldState(text = "m38rmF$"))
+    private val _passwordState = mutableStateOf(TextFieldState(text = ""))
     val passwordState: State<TextFieldState> = _passwordState
     fun setPassword(value: String) {
         _passwordState.value = _passwordState.value.copy(text = value)
@@ -80,6 +80,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
                         UiEvents.NavigateEvent(HomeScreenDestination.route)
                     )
                 }
+
                 is Resource.Error -> {
                     _eventFlow.emit(
                         UiEvents.SnackbarEvent(
@@ -87,6 +88,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
                         )
                     )
                 }
+
                 else -> {}
             }
         }

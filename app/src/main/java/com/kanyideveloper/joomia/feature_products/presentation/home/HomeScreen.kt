@@ -50,6 +50,8 @@ import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ProductDetailsScreenDestination
 import com.kanyideveloper.joomia.feature_products.domain.model.Product
+import com.kanyideveloper.joomia.feature_profile.domain.model.User
+import com.kanyideveloper.joomia.feature_profile.domain.model.getDisplayName
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -69,7 +71,10 @@ fun HomeScreen(
     val context = LocalContext.current
     val productsState = viewModel.productsState.value
     val categories = viewModel.categoriesState.value
-
+    LaunchedEffect(key1 = true, block = {
+        viewModel.getProfile()
+    })
+    val user = viewModel.profileState.value
     Scaffold(
         topBar = {
             MyTopAppBar(
@@ -89,6 +94,7 @@ fun HomeScreen(
                     viewModel.setCategory(category)
                     viewModel.getProducts(viewModel.selectedCategory.value)
                 },
+                user = user
             )
         },
     ) {
@@ -306,6 +312,7 @@ fun MyTopAppBar(
     categories: List<String>,
     onSelectCategory: (String) -> Unit,
     selectedCategory: String,
+    user: User,
 ) {
     Column(
         Modifier
@@ -323,7 +330,7 @@ fun MyTopAppBar(
                 verticalAlignment = CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "Hi, John", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Hi, ${user.getDisplayName()}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
             Icon(

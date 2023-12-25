@@ -18,13 +18,17 @@ class LoginRepositoryImpl(
     override suspend fun login(loginRequest: LoginRequest, rememberMe: Boolean): Resource<Unit> {
         Timber.d("Login called")
         return try {
-            val response = authApiService.loginUser(loginRequest)
-            Timber.d("Login Token: ${response.token}")
-
-            getAllUsers(loginRequest.username)?.let { authPreferences.saveUserdata(it) }
-
-            if (rememberMe) {
-                authPreferences.saveAccessToken(response.token)
+            getRandomUsers().let {
+                authPreferences.saveUserdata(it)
+                val randomLoginRequest = LoginRequest(
+                    username = it.username.trim(),
+                    password = it.password.trim()
+                )
+                val response = authApiService.loginUser(randomLoginRequest)
+                Timber.d("Login Token: ${response.token}")
+                if (rememberMe) {
+                    authPreferences.saveAccessToken(response.token)
+                }
             }
             Resource.Success(Unit)
         } catch (e: IOException) {
@@ -60,8 +64,8 @@ class LoginRepositoryImpl(
         }
     }
 
-    private suspend fun getAllUsers(name: String): UserResponseDto? {
+    private suspend fun getRandomUsers(): UserResponseDto {
         val response = authApiService.getAllUsers()
-        return response.find { it.username == name }
+        return response.random()
     }
 }
