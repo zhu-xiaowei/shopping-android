@@ -1,11 +1,13 @@
 <p align="center"><img src="screenshots/joomia.png" alt="Joomia" height="100px"></p>
 
-# Joomia 🛒
+# Joomia
 A fake shopping app built with Jetpack Compose consuming [FAKE STORE API](https://fakestoreapi.com/)
+
+And this app is already integrated with Clickstream Android SDK. You can find more detail about the [Clickstream Android SDK](https://github.com/awslabs/clickstream-android).
 
 ## Note:
 - The API has some endpoints that does nothing i.e adding item to cart, registering a user and many more. So some screens have UI implementation but no logic
-- Contributions are welcomed, because the app is far away from being good 😂
+- Contributions are welcomed, because the app is far away from being good
 
 ## To Login - use :
     - Username: input random string
@@ -14,13 +16,9 @@ A fake shopping app built with Jetpack Compose consuming [FAKE STORE API](https:
 We will generate a random user for you to use this App.
 
 ## Demo
-<img src="screenshots/splash.png" width="250"/> <img src="screenshots/auth.png" width="250"/>
+<img src="screenshots/splash.png" width="250"/> <img src="screenshots/register.png" width="250"/> <img src="screenshots/account.png" width="250"/>
 
-<img src="screenshots/register.png" width="250"/> <img src="screenshots/login.png" width="250"/>
-
-<img src="screenshots/home.png" width="250"/> <img src="screenshots/details.png" width="250"/> <img src="screenshots/wishlist.png" width="250"/>
-
-<img src="screenshots/cart.png" width="250"/> <img src="screenshots/account.png" width="250"/>
+<img src="screenshots/home.png" width="250"/> <img src="screenshots/details.png" width="250"/> <img src="screenshots/cart.png" width="250"/> 
 
 
 ## Tech Stack.
