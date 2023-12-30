@@ -1,10 +1,12 @@
 package com.kanyideveloper.joomia.feature_products.presentation.product_details
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +43,7 @@ import software.aws.solution.clickstream.ClickstreamAnalytics
 import software.aws.solution.clickstream.ClickstreamEvent
 import software.aws.solution.clickstream.ClickstreamItem
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
 fun ProductDetailsScreen(
@@ -133,6 +136,22 @@ fun DetailsScreenContent(
     modifier: Modifier = Modifier,
 ) {
     Column {
+        LaunchedEffect(product.id) {
+            val itemProduct = ClickstreamItem.builder()
+                .add(ClickstreamAnalytics.Item.ITEM_ID, product.id)
+                .add(ClickstreamAnalytics.Item.ITEM_NAME, product.title)
+                .add(ClickstreamAnalytics.Item.ITEM_CATEGORY, product.category)
+                .add(ClickstreamAnalytics.Item.PRICE, product.price)
+                .add("rating", product.rating.rate)
+                .add("description", product.description)
+                .build()
+            val event = ClickstreamEvent.builder()
+                .name("item_view")
+                .add("item_id", product.id)
+                .setItems(arrayOf(itemProduct))
+                .build()
+            ClickstreamAnalytics.recordEvent(event)
+        }
         Box(modifier = modifier.weight(1f), contentAlignment = Alignment.Center) {
             Image(
                 painter = rememberAsyncImagePainter(
@@ -247,7 +266,7 @@ fun DetailsScreenContent(
                             val event = ClickstreamEvent.builder()
                                 .name("add_to_cart")
                                 .add("product_id", product.id)
-                                .add("page_name","product_detail_screen")
+                                .add("page_name", "product_detail_screen")
                                 .setItems(arrayOf(itemProduct))
                                 .build()
                             ClickstreamAnalytics.recordEvent(event)

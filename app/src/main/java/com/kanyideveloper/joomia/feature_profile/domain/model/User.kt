@@ -11,7 +11,8 @@ data class User(
     val name: Name? = null,
     val password: String? = null,
     val phone: String? = null,
-    val username: String? = null
+    val username: String? = null,
+    val avatar: String? = null
 )
 
 fun User.getDisplayName(): String {

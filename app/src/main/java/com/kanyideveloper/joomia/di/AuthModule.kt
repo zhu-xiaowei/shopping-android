@@ -1,7 +1,7 @@
 package com.kanyideveloper.joomia.di
 
 import com.kanyideveloper.joomia.core.util.Constants.BASE_URL
-import com.kanyideveloper.joomia.feature_auth.data.local.AuthPreferences
+import com.kanyideveloper.joomia.feature_auth.data.local.DataPreferences
 import com.kanyideveloper.joomia.feature_auth.data.remote.AuthApiService
 import com.kanyideveloper.joomia.feature_auth.data.repository.LoginRepositoryImpl
 import com.kanyideveloper.joomia.feature_auth.domain.repository.LoginRepository
@@ -34,11 +34,11 @@ object AuthModule {
     @Singleton
     fun provideLoginRepository(
         authApiService: AuthApiService,
-        authPreferences: AuthPreferences
+        dataPreferences: DataPreferences
     ): LoginRepository {
         return LoginRepositoryImpl(
             authApiService = authApiService,
-            authPreferences = authPreferences
+            dataPreferences = dataPreferences
         )
     }
 

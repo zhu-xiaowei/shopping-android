@@ -11,6 +11,7 @@ internal fun UserResponseDto.toDomain(): User {
         name = name,
         password = password,
         phone = phone,
-        username = username
+        username = username,
+        avatar = avatar
     )
 }

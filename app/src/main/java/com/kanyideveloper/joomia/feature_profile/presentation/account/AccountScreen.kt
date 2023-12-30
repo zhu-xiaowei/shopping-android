@@ -1,5 +1,6 @@
 package com.kanyideveloper.joomia.feature_profile.presentation.account
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -41,8 +42,10 @@ import com.kanyideveloper.joomia.feature_profile.domain.model.getDisplayName
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
+import software.aws.solution.clickstream.ClickstreamAnalytics
 import java.util.*
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
 fun AccountScreen(
@@ -57,6 +60,7 @@ fun AccountScreen(
     val scaffoldState = rememberScaffoldState()
 
     LaunchedEffect(key1 = true) {
+        ClickstreamAnalytics.recordEvent("view_account")
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvents.SnackbarEvent -> {
@@ -67,6 +71,7 @@ fun AccountScreen(
                         )
                     }
                 }
+
                 is UiEvents.NavigateEvent -> {
                     navigator.navigate(event.route) {
                         popUpTo(AccountScreenDestination.route) {
@@ -201,7 +206,7 @@ fun UserItem(
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = "https://firebasestorage.googleapis.com/v0/b/savingszetu.appspot.com/o/50293753.jpeg?alt=media&token=a7174053-5253-49ed-b885-08f428df0287")
+                        .data(data = user.avatar)
                         .apply(block = fun ImageRequest.Builder.() {
                             placeholder(R.drawable.ic_placeholder)
                             crossfade(true)
@@ -209,11 +214,12 @@ fun UserItem(
                 ),
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(15.dp)
                     .weight(1f)
                     .clip(CircleShape)
+                    .fillMaxWidth()
                     .fillMaxHeight(),
-                contentScale = ContentScale.Inside
+                contentScale = ContentScale.FillBounds
             )
             Spacer(modifier = Modifier.width(5.dp))
 

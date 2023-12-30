@@ -13,7 +13,9 @@ import com.kanyideveloper.joomia.feature_auth.domain.use_case.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import software.aws.solution.clickstream.ClickstreamAnalytics
 import software.aws.solution.clickstream.ClickstreamUserAttribute
 import javax.inject.Inject
@@ -68,14 +70,6 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
 
             when (loginResult.result) {
                 is Resource.Success -> {
-                    ClickstreamAnalytics.setUserId(usernameState.value.text)
-                    val userAttribute = ClickstreamUserAttribute.builder()
-                        .add("user_name", usernameState.value.text)
-                        .add("user_age", 18)
-                        .add("user_state", true)
-                        .build()
-                    ClickstreamAnalytics.addUserAttributes(userAttribute)
-                    ClickstreamAnalytics.recordEvent("login")
                     _eventFlow.emit(
                         UiEvents.NavigateEvent(HomeScreenDestination.route)
                     )

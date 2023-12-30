@@ -1,5 +1,6 @@
 package com.kanyideveloper.joomia.feature_auth.presentation.login
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +31,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
 @Composable
@@ -111,7 +113,6 @@ fun LoginScreen(
         )
     }
 }
-
 @Composable
 private fun LoginScreenContent(
     usernameState: TextFieldState,

@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.google.gson.Gson
-import com.kanyideveloper.joomia.feature_auth.data.local.AuthPreferences
+import com.kanyideveloper.joomia.feature_auth.data.local.DataPreferences
 import com.kanyideveloper.joomia.feature_auth.util.Constants.AUTH_PREFERENCES
 import dagger.Module
 import dagger.Provides
@@ -31,7 +31,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAuthPreferences(dataStore: DataStore<Preferences>, gson: Gson) =
-        AuthPreferences(dataStore, gson)
+        DataPreferences(dataStore, gson)
 
     @Provides
     @Singleton

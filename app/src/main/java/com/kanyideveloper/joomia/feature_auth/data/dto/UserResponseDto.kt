@@ -19,5 +19,6 @@ data class UserResponseDto(
     @SerializedName("username")
     val username: String,
     @SerializedName("__v")
-    val v: Int
+    val v: Int,
+    var avatar: String
 )

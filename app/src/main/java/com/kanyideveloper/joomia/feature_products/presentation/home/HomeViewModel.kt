@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
+import com.kanyideveloper.joomia.feature_auth.data.local.DataPreferences
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetCategoriesUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
 import com.kanyideveloper.joomia.feature_profile.data.repository.ProfileRepository
@@ -18,7 +19,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,6 +30,7 @@ class HomeViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val getProductsUseCase: GetProductsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val dataPreferences: DataPreferences,
     private val gson: Gson,
 ) :
     ViewModel() {
@@ -79,13 +83,34 @@ class HomeViewModel @Inject constructor(
 
     fun getProducts(category: String = "All", searchTerm: String = "") {
         viewModelScope.launch {
+            if (category == "All") {
+                val products = runBlocking { dataPreferences.getProducts.first() }
+                if (products.isNotEmpty()) {
+                    _productsState.value = productsState.value.copy(
+                        products = if (searchTerm.isEmpty()) {
+                            products
+                        } else {
+                            products.filter {
+                                it.title.contains(
+                                    searchTerm,
+                                    ignoreCase = true
+                                )
+                            }
+                        },
+                        isLoading = false
+                    )
+                    return@launch
+                }
+            }
             getProductsUseCase().collectLatest { result ->
                 when (result) {
                     is Resource.Success -> {
                         if (category == "All") {
                             _productsState.value = productsState.value.copy(
                                 products = if (searchTerm.isEmpty()) {
-                                    result.data ?: emptyList()
+                                    val mProducts = result.data ?: emptyList()
+                                    dataPreferences.saveProducts(mProducts)
+                                    mProducts
                                 } else {
                                     result.data?.filter {
                                         it.title.contains(
@@ -104,11 +129,13 @@ class HomeViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Loading -> {
                         _productsState.value = productsState.value.copy(
                             isLoading = true
                         )
                     }
+
                     is Resource.Error -> {
                         _productsState.value = productsState.value.copy(
                             isLoading = false,

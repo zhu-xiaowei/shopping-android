@@ -1,5 +1,6 @@
 package com.kanyideveloper.joomia.feature_cart.presentation.cart
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.util.rangeTo
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -29,7 +31,11 @@ import com.kanyideveloper.joomia.feature_cart.domain.model.CartProduct
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
+import software.aws.solution.clickstream.ClickstreamAnalytics
+import software.aws.solution.clickstream.ClickstreamEvent
+import software.aws.solution.clickstream.ClickstreamItem
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
 fun CartScreen(
@@ -40,11 +46,13 @@ fun CartScreen(
     val scaffoldState = rememberScaffoldState()
 
     LaunchedEffect(key1 = true) {
+        ClickstreamAnalytics.recordEvent("view_cart")
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvents.SnackbarEvent -> {
                     scaffoldState.snackbarHostState.showSnackbar(event.message)
                 }
+
                 else -> {}
             }
         }
@@ -185,7 +193,24 @@ private fun CheckoutComponent(state: CartItemsState) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = {},
+            onClick = {
+                val items = arrayOfNulls<ClickstreamItem>(state.cartItems.size)
+                for (i in 0 until state.cartItems.size) {
+                    val itemProduct = ClickstreamItem.builder()
+                        .add(ClickstreamAnalytics.Item.ITEM_ID, state.cartItems[i].id)
+                        .add(ClickstreamAnalytics.Item.ITEM_NAME, state.cartItems[i].name)
+                        .add(ClickstreamAnalytics.Item.PRICE, state.cartItems[i].price)
+                        .add(ClickstreamAnalytics.Item.QUANTITY, state.cartItems[i].quantity)
+                        .add(ClickstreamAnalytics.Item.ITEM_CATEGORY, state.cartItems[i].category)
+                        .build()
+                    items[i] = itemProduct
+                }
+                val event = ClickstreamEvent.builder()
+                    .name("check_out")
+                    .setItems(items)
+                    .build()
+                ClickstreamAnalytics.recordEvent(event)
+            },
             shape = RoundedCornerShape(8)
         ) {
             Text(

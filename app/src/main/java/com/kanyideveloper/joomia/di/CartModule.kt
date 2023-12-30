@@ -2,7 +2,7 @@ package com.kanyideveloper.joomia.di
 
 import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Constants
-import com.kanyideveloper.joomia.feature_auth.data.local.AuthPreferences
+import com.kanyideveloper.joomia.feature_auth.data.local.DataPreferences
 import com.kanyideveloper.joomia.feature_cart.data.remote.CartApiService
 import com.kanyideveloper.joomia.feature_cart.data.repository.CartRepositoryImpl
 import com.kanyideveloper.joomia.feature_cart.domain.repository.CartRepository
@@ -32,10 +32,12 @@ object CartModule {
     @Provides
     @Singleton
     fun provideCartRepository(
-        cartApiService: CartApiService
+        cartApiService: CartApiService,
+        dataPreferences: DataPreferences
     ): CartRepository {
         return CartRepositoryImpl(
-            cartApiService
+            cartApiService,
+            dataPreferences
         )
     }
 
@@ -43,9 +45,9 @@ object CartModule {
     @Singleton
     fun provideGetCartItemsUseCase(
         cartRepository: CartRepository,
-        authPreferences: AuthPreferences,
+        dataPreferences: DataPreferences,
         gson: Gson
     ): GetCartItemsUseCase {
-        return GetCartItemsUseCase(cartRepository, authPreferences, gson)
+        return GetCartItemsUseCase(cartRepository, dataPreferences, gson)
     }
 }
