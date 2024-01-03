@@ -33,18 +33,21 @@ class CartViewModel @Inject constructor(
 
     private suspend fun getCartItems() {
         getCartItemsUseCase().collectLatest { result ->
+            val resultList = result.data?.take(2) ?: emptyList()
             when (result) {
                 is Resource.Success -> {
                     _state.value = state.value.copy(
-                        cartItems = result.data ?: emptyList(),
+                        cartItems = resultList,
                         isLoading = false
                     )
                 }
+
                 is Resource.Loading -> {
                     _state.value = state.value.copy(
                         isLoading = true
                     )
                 }
+
                 is Resource.Error -> {
                     _state.value = state.value.copy(
                         isLoading = false,

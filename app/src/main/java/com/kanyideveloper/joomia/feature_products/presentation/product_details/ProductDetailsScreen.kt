@@ -12,12 +12,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,6 +47,7 @@ import software.aws.solution.clickstream.ClickstreamAnalytics
 import software.aws.solution.clickstream.ClickstreamEvent
 import software.aws.solution.clickstream.ClickstreamItem
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination
 @Composable
@@ -75,6 +80,9 @@ fun ProductDetailsScreen(
                     )
                 }
                 IconButton(
+                    modifier = Modifier.semantics {
+                        testTag = "like_button"; testTagsAsResourceId = true
+                    },
                     onClick = {
                         if (inWishlist) {
                             viewModel.deleteFromWishlist(
@@ -130,6 +138,7 @@ fun ProductDetailsScreen(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DetailsScreenContent(
     product: Product,
@@ -254,6 +263,9 @@ fun DetailsScreenContent(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Button(
+                        modifier = Modifier.semantics {
+                            testTag = "add_to_cart_button"; testTagsAsResourceId = true
+                        },
                         onClick = {
                             val itemProduct = ClickstreamItem.builder()
                                 .add(ClickstreamAnalytics.Item.ITEM_ID, product.id)

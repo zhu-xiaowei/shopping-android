@@ -12,6 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +50,7 @@ fun LoginScreen(
     val scaffoldState = rememberScaffoldState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    Modifier.semantics { testTagsAsResourceId = true; testTagsAsResourceId = true }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -57,6 +61,7 @@ fun LoginScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
+
                 is UiEvents.NavigateEvent -> {
                     navigator.navigate(
                         event.route
@@ -113,6 +118,8 @@ fun LoginScreen(
         )
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun LoginScreenContent(
     usernameState: TextFieldState,
@@ -134,7 +141,9 @@ private fun LoginScreenContent(
 
             Column {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .semantics { testTag = "userName"; testTagsAsResourceId = true }
+                        .fillMaxWidth(),
                     value = usernameState.text,
                     onValueChange = {
                         onUserNameTextChange(it)
@@ -166,7 +175,9 @@ private fun LoginScreenContent(
 
             Column {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { testTag = "password"; testTagsAsResourceId = true },
                     value = passwordState.text,
                     onValueChange = {
                         onPasswordTextChange(it)
@@ -221,6 +232,7 @@ private fun LoginScreenContent(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
+                modifier = Modifier.semantics { testTag = "signIn"; testTagsAsResourceId = true },
                 onClick = onClickSignIn,
                 shape = RoundedCornerShape(8),
                 enabled = !loginState.isLoading

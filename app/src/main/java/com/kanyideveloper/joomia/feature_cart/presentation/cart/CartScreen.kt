@@ -10,11 +10,15 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -148,6 +152,7 @@ private fun CartScreenContent(state: CartItemsState) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun CheckoutComponent(state: CartItemsState) {
     Column(Modifier.padding(12.dp)) {
@@ -193,6 +198,9 @@ private fun CheckoutComponent(state: CartItemsState) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
+            modifier = Modifier.semantics {
+                testTag = "check_out_button"; testTagsAsResourceId = true
+            },
             onClick = {
                 val items = arrayOfNulls<ClickstreamItem>(state.cartItems.size)
                 for (i in 0 until state.cartItems.size) {

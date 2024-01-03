@@ -7,7 +7,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -16,6 +21,7 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.GrayColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.feature_products.domain.model.BottomNavItem
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CustomScaffold(
     navController: NavController,
@@ -39,6 +45,10 @@ fun CustomScaffold(
                     val currentDestination = navBackStackEntry?.destination
                     items.forEach { item ->
                         BottomNavigationItem(
+                            modifier = Modifier.semantics {
+                                testTag = "homeTab" + items.indexOf(item)
+                                testTagsAsResourceId = true
+                            },
                             icon = {
                                 Icon(
                                     painter = painterResource(id = item.icon),
